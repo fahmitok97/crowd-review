@@ -1,29 +1,35 @@
 import json
 
+# @author = Anab
 def remove_special_character(tweet):
-    # include remove newline, special character and unicode
     pass
 
+# @author = Aldi
 def remove_mention(tweet):
     pass
 
+# @author = Ayaz
 def remove_hashtag(tweet):
     pass
 
+# @author = Aldi
 def separate_between_char_and_non_char(tweet):
     pass
 
+# @author = Anab
 def to_lower(tweet):
     pass
 
+# @author = Fahmi
 def normalize_slang(tweet):
     pass
 
+# @author = Ayaz
 def filter_non_alphanumeric(tweet):
     pass
 
+# @author = Fahmi
 def word_count(tweet):
-    # return length of words
     pass
 
 def preprocess_tweet(tweet):
