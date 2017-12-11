@@ -6,7 +6,7 @@ from settings import NUM_CRAWLED
 def search_by_hashtag(hashtag):
 	api = tweepy.API(get_auth())
 	crawled = 0
-	for status in tweepy.Cursor(api.search, q=hashtag, tweet_mode='extended').items(3 * NUM_CRAWLED):
+	for status in tweepy.Cursor(api.search, q=hashtag, tweet_mode='extended', lang='en').items(3 * NUM_CRAWLED):
 
 		if crawled == NUM_CRAWLED:
 			break
