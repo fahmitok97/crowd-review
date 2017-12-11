@@ -2,6 +2,13 @@ import tweepy
 import json
 from auth import get_auth
 from settings import NUM_CRAWLED
+from whitelist import ADJECTIVE_SUPERLATIVE_MAP
+
+def contain_whitelist(tweet):
+	for word in tweet.split(' '):
+		if word.lower() in ADJECTIVE_SUPERLATIVE_MAP:
+			return True
+	return False
 
 def search_by_hashtag(hashtag):
 	api = tweepy.API(get_auth())
@@ -14,6 +21,9 @@ def search_by_hashtag(hashtag):
 		if status.full_text[:2] == 'RT':
 			continue
 
+		if not contain_whitelist(status.full_text):
+			continue
+
 		crawled += 1	
 
 		with open('review.json') as f:
@@ -24,23 +34,20 @@ def search_by_hashtag(hashtag):
 		with open('review.json', 'w') as f:
 			json.dump(tweets, f)
 
-search_by_hashtag('#dunkirk')
 search_by_hashtag('#coco')
-search_by_hashtag('#EmojiMovie')
-search_by_hashtag('#ThorRagnarok')
 search_by_hashtag('#justiceleague')
-search_by_hashtag('#transformers')
-search_by_hashtag('#cars2')
-search_by_hashtag('#hoteltransylvania')
-search_by_hashtag('#NYSM2')
-search_by_hashtag('#traintobusan')
-search_by_hashtag('#wonderwoman')
-search_by_hashtag('#cultofchucky')
-search_by_hashtag('#catwoman')
-search_by_hashtag('#babadook')
-search_by_hashtag('#moana')
-search_by_hashtag('#thepurge')
-search_by_hashtag('#GirlsTrip')
-search_by_hashtag('#captainunderpants')
-search_by_hashtag('#sharknado')
-search_by_hashtag('#fiftyshadesdarker')
+search_by_hashtag('#wonderthemovie')
+search_by_hashtag('#daddyshome2')
+search_by_hashtag('#thorragnarok')
+search_by_hashtag('#murderontheorientexpress')
+search_by_hashtag('#starmovie')
+search_by_hashtag('#ladybird')
+search_by_hashtag('#threebillboards')
+search_by_hashtag('#badmomsxmas')
+search_by_hashtag('#jigsaw')
+search_by_hashtag('#itmovie')
+search_by_hashtag('#despicableme3')
+search_by_hashtag('#geostorm')
+search_by_hashtag('#theforeigner')
+search_by_hashtag('#happydeathday')
+search_by_hashtag('#kingsmanthegoldencircle')
