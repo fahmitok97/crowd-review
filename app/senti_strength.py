@@ -83,9 +83,11 @@ def senti_strength(words):
         else if word == '!':
             if prev_word_from_dict != "":
                 words_strength[-1] += 1 if words_strength[-1] - 1e-9 > 0 else words_strength[-1] -= 1
+            prev_word_from_dict = ""
         else if word == '?':
             if prev_word_from_dict != "":
                 words_strength[-1] = 0
+            prev_word_from_dict = ""
         else:
             word, is_repeating = find_word_from_dict(word, word_dict)
 
