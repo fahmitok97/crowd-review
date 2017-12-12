@@ -126,4 +126,7 @@ def senti_strength(words):
             is_negating = False
             prev_word_from_dict = word
 
+    if not words_strength:
+        return 0, 0
+
     return min(words_strength), max(words_strength)
