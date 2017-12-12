@@ -1,82 +1,87 @@
+from ekphrasis.classes.preprocessor import TextPreProcessor
 from ekphrasis.classes.tokenizer import SocialTokenizer
-from ekphrasis.classes.segmenter import Segmenter
+from ekphrasis.dicts.emoticons import emoticons
 
 import json
 
-# # @author = Anab
-# def remove_special_character(tweet):
-#     pass
+EMOJI_MAPPER = {'😃': '<happy>'}
 
-# # @author = Aldi
-# def remove_mention(tweet):
-#     pass
+OMITTED_TOKEN = ['~', ',', '&', '"', '\'', '{', '}', '#', '@', '$', '%', '^', '*', '(', ')', '-', '_', '=', '[', ']', '|'
+                '±', '§', '\\', '<', '>', '?', '/', '`', '.', '+']
 
-# # @author = Ayaz
-# def remove_hashtag(tweet):
-#     #seg_tw = Segmenter(corpus="twitter")
-#     tokens = tweet.token()
-#     #return seg_tw.segment(tweet)
-#     pass
+class Token():
 
-# # @author = Aldi
-# def separate_between_char_and_non_char(tweet):
-#     pass
+        def __init__(self, context=''):
+            self.context = context
+            self.properties = []
 
-# # @author = Anab
-# def to_lower(tweet):
-#     pass
+        def add_prop(self, property):
+            self.properties.append(property)
 
-# # @author = Fahmi
-# def normalize_slang(tweet):
-#     pass
+        def get_prop(self):
+            return self.properties
 
-# # @author = Ayaz
-# def filter_non_alphanumeric(tweet):
-#     pass
+        def get_context(self):
+            return self.context
 
-# # @author = Fahmi
-# def word_count(tweet):
-#     pass
-
-# def tokenize(tweet):
-#     social_tokenizer = SocialTokenizer(lowercase=False).tokenize
-
-
-# def preprocess_tweet(tweet):
-#     tweet_tokens = tokenize(tweet)
-#     tweet = remove_mention(tweet)
-#     tweet = remove_hashtag(tweet)
-#     tweet = separate_between_char_and_non_char(tweet)
-#     tweet = to_lower(tweet)
-#     tweet = normalize_slang(tweet)
-#     tweet = filter_non_alphanumeric(tweet)
-
-    # return tweet
+        def __repr__(self):
+            return self.context + ' ' + ' '.join(self.properties)
 
 class PreProcessor():
 
     def __init__(self):
-        self.social_tokenizer = SocialTokenizer(lowercase=False).tokenize
-        self.segmenter = Segmenter(corpus="twitter")
+        self.text_processor = TextPreProcessor(
+            # terms that will be normalized
+            normalize=['url', 'email', 'percent', 'money', 'phone', 'user', 'time', 'url', 'date', 'number'],
+            # omit after normalized
+            omit=['url', 'email', 'percent', 'money', 'phone', 'user', 'time', 'url', 'date', 'number'],
+            # terms that will be annotated
+            annotate={'allcaps', 'elongated', 'repeated','emphasis'},
 
-    def __tokenize(self, tweet):
-        return self.social_tokenizer(tweet)
+            # corpus from which the word statistics are going to be used
+            # for word segmentation
+            segmenter="twitter",
 
-    def __expand_hashtag(self, tweet_tokens):
-        return [ item for tweet_token in tweet_tokens for item in self.segmenter.segment(tweet_token).split(' ')]
+            # corpus from which the word statistics are going to be used
+            # for spell correction
+            corrector="twitter",
+
+            unpack_hashtags=True,  # perform word segmentation on hashtags
+            unpack_contractions=True,  # Unpack contractions (can't -> can not)
+            spell_correct_elong=False,  # spell correction for elongated words
+            spell_correction=True,
+
+            # select a tokenizer. You can use SocialTokenizer, or pass your own
+            # the tokenizer, should take as input a string and return a list of tokens
+            tokenizer=SocialTokenizer(lowercase=True).tokenize,
+
+            # list of dictionaries, for replacing tokens extracted from the text,
+            # with other expressions. You can pass more than one dictionaries.
+            dicts=[emoticons, EMOJI_MAPPER]
+        )
 
     def process_doc(self, tweet):
-        tweet_tokens = self.__tokenize(tweet)
-        tweet_tokens = self.__expand_hashtag(tweet_tokens)
-        return tweet_tokens
+        tokenized_doc = self.text_processor.pre_process_doc(tweet)
+        tokens = []
+        prevToken = Token()
 
-def main():
-    pre_processor = PreProcessor()
+        for elem in tokenized_doc:
+            if elem[0] == '<':
+                prevToken.add_prop(elem[1:len(elem)-1])
+            else:
+                if prevToken.get_context() not in OMITTED_TOKEN:
+                    tokens.append(prevToken)
+                prevToken = Token(context=elem)
 
-    with open('review.json') as f:
-            tweets = json.load(f)
-
-    print(pre_processor.process_doc(tweets[0]))
+        tokens.append(prevToken)
+        return tokens[1:]
 
 
-main()
+
+pre_processor = PreProcessor()
+with open('review.json') as f:
+        tweets = json.load(f)
+
+for tweet in tweets:
+    print(pre_processor.process_doc(tweet))
+
