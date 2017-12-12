@@ -1,4 +1,4 @@
-"BOOSTER_WORDS": {
+{
 	"absolutely": 1,
 	"complete": 1,
 	"completely": 1,
@@ -28,5 +28,3 @@
 	"very": 1,
 	"would": -1
 }
-
-// https"://github.com/athanrous/PySentiment/blob/master/SentiStrength/SentStrength_Data/BoosterWordList.txt

@@ -1,4 +1,4 @@
-"WORDS_WITH_STRENGTH": {
+{
 	"epic": 1,
 	"good": 1,
 	"upright": 1,
@@ -18543,5 +18543,3 @@
 	"calumnious": -1,
 	"calumniatory": -1
 }
-
-// https://github.com/hitesh915/sentimentstrength/blob/master/wordwithStrength.txt
