@@ -33,26 +33,30 @@ def find_word_from_dict(word, word_dict):
             start_idx = current_idx
 
     if cnt >= 3:
-        repeating_idxs.append((start_idx, current_idx - 1))
-
+        repeating_idxs.append((start_idx, current_idx))
 
     # bruteforce all combination
     for bitmask in range(0, 2**len(repeating_idxs)):
-        cur_bitmask = bitmask
+        cur_bitmask = int(bitmask)
         cur_word = word
+        deleted_character = 0
 
         for i in range(0, len(repeating_idxs)):
             start_idx, end_idx = repeating_idxs[i]
 
+            start_idx -= deleted_character
+            end_idx -= deleted_character
+
             if cur_bitmask % 2 == 1:
                 # take 2 chars
                 cur_word = cur_word[:(start_idx+2)] + cur_word[(end_idx+1):]
+                deleted_character += (end_idx - start_idx - 1)
             else:
                 # take 
                 cur_word = cur_word[:(start_idx+1)] + cur_word[(end_idx+1):]
+                deleted_character += (end_idx - start_idx)
                 
-
-            cur_bitmask /= 2
+            cur_bitmask = int(cur_bitmask / 2)
 
         if cur_word in word_dict:
             return cur_word, True
@@ -77,14 +81,14 @@ def senti_strength(words):
         if word in negating_word_dict:
             is_negating = True
             prev_word_from_dict = ""
-        else if word in booster_word_dict:
+        elif word in booster_word_dict:
             booster_score += booster_word_dict[word]
             prev_word_from_dict = ""
-        else if word == '!':
+        elif word == '!':
             if prev_word_from_dict != "":
-                words_strength[-1] += 1 if words_strength[-1] - 1e-9 > 0 else words_strength[-1] -= 1
+                words_strength[-1] += (1 if words_strength[-1] - 1e-9 > 0 else -1)
             prev_word_from_dict = ""
-        else if word == '?':
+        elif word == '?':
             if prev_word_from_dict != "":
                 words_strength[-1] = 0
             prev_word_from_dict = ""
@@ -97,12 +101,12 @@ def senti_strength(words):
             current_strength = word_dict[word]
 
             if is_repeating is True:
-                current_strength += 1 if current_strength - 1e-9 > 0 else current_strength -= 1
+                current_strength += (1 if current_strength - 1e-9 > 0 else -1)
 
             if prev_word_from_dict != "":
                 polarity = current_strength * words_strength[-1]
                 if polarity - 1e-9 > 0:
-                    current_strength += 1 if current_strength - 1e-9 > 0 else current_strength -= 1
+                    current_strength += (1 if current_strength - 1e-9 > 0 else -1)
 
             if is_negating is True:
                 current_strength *= -1
@@ -113,6 +117,8 @@ def senti_strength(words):
                 booster_score *= -1
 
             current_strength += booster_score
+
+            print (word, current_strength)
 
             words_strength.append(current_strength)
 
