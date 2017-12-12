@@ -3,10 +3,17 @@ import json
 from auth import get_auth
 from settings import NUM_CRAWLED
 from whitelist import ADJECTIVE_SUPERLATIVE_MAP
+from negative_words import NEGATIVE_WORDS
 
 def contain_whitelist(tweet):
 	for word in tweet.split(' '):
 		if word.lower() in ADJECTIVE_SUPERLATIVE_MAP:
+			return True
+	return False
+
+def contain_negative(tweet):
+	for word in tweet.split(' '):
+		if word.lower() in NEGATIVE_WORDS:
 			return True
 	return False
 
@@ -21,7 +28,10 @@ def search_by_hashtag(hashtag):
 		if status.full_text[:2] == 'RT':
 			continue
 
-		if not contain_whitelist(status.full_text):
+		# if not contain_whitelist(status.full_text):
+		# 	continue
+
+		if not contain_negative(status.full_text):
 			continue
 
 		crawled += 1	
