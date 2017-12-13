@@ -5,7 +5,7 @@ import traceback
 import random
 app = Flask(__name__)
 
-token = "EAAYcuw9LdEMBACtQZAI04mHAS1ezwvJBUTxW6382MziVYZAJEmQRJnbVVH484j40AqZB9zchVhMioZC0JZB9mQCOvver1vQJNeriaWTDcRfPZCWGIrwPlZCYG0j1ZBLr15QlK8aX6xT7iYE92zsKpOlhIBY7PZBSzDJBo9ZCrNZC1eItgZDZD"
+token = "EAAYcuw9LdEMBANZAYCZAZCmNVMRlpSTXvVJTbvhkWA15iNtomikjwbB2EuKtBZCCwcGJSTpZBZAKIzTTZC4byZB7ypR2LvgNswzpkLclznZAdxdRZCoBdBBSbU0jmZA1ZB3ocZC6JVFDKuh3ls5iJnm2bxKRuIQPkaZCnZAwgkiNaCGN2JAmAZDZD"
 
 def get_sentiment(movie_name):
   sentiment_result = 0.99 # Pecahan banyaknya yang nilai positif
