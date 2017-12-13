@@ -71,16 +71,16 @@ def generate_carousel_response(sender,
 def webhook():
   if request.method == 'POST':
     try:
-      print(request.data)
       data = json.loads(request.data.decode('utf-8'))
       text = data['entry'][0]['messaging'][0]['message']['text']
       sender = data['entry'][0]['messaging'][0]['sender']['id']
 
       sentiment_result, sample_tweets = get_sentiment(text) # Assume text langsung nama movie
-      print(sample_tweets)
       payload = generate_carousel_response(sender, text, sentiment_result, sample_tweets)
+      print('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token)
+      print(json.dumps(payload))
       
-      requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, json=payload) # Lets send it
+      requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, json=json.dumps(payload)) # Lets send it
     except Exception as e:
       print(traceback.format_exc())
 
