@@ -1,3 +1,5 @@
 __pycache__
 settings.py
 review.json
+env/
+env-bash/
