@@ -11,13 +11,13 @@ def get_sentiment(movie_name):
   sentiment_result = 0.99 # Pecahan banyaknya yang nilai positif
   sample_tweets = [
     {
-      'link': 'https://twitter.com/view?item=xxx',
-      'image_url': 'https://petersfancybrownhats.com/company_image.png',
+      'link': 'https://twitter.com/CompFest/status/926061421653245952',
+      'image_url': 'http://i0.kym-cdn.com/entries/icons/medium/000/005/180/YaoMingMeme.jpg',
       'text': 'Must watch #sharknado'
     },
     {
-      'link': 'https://twitter.com/view?item=xxx',
-      'image_url': None,
+      'link': 'https://twitter.com/CompFest/status/926061421653245952',
+      'image_url': 'http://i0.kym-cdn.com/entries/icons/medium/000/005/180/YaoMingMeme.jpg',
       'text': '11/10 #sharknado2'
     }
   ]
@@ -30,7 +30,7 @@ def generate_carousel_response(sender,
                                sample_tweets):
   tweet_elements = [
      {
-      "title": 'Sample Tweet-{}'.format(i),
+      "title": 'Sample Tweet-{}'.format(i + 1),
       "image_url": sample_tweets[i]['image_url'],
       "subtitle": sample_tweets[i]['text'],
       "default_action": {
@@ -74,13 +74,19 @@ def webhook():
       data = json.loads(request.data.decode('utf-8'))
       text = data['entry'][0]['messaging'][0]['message']['text']
       sender = data['entry'][0]['messaging'][0]['sender']['id']
+      movie_name = text
+      sentiment_result, sample_tweets = get_sentiment(movie_name) # Assume text langsung nama movie
+      
+      payload = {'recipient': {'id': sender}, 'message': {'text': '{} has about {} fraction people liking it on twitter! Here are the sample tweets'.format(movie_name, sentiment_result)}}
+      r = requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, json=payload)
 
-      sentiment_result, sample_tweets = get_sentiment(text) # Assume text langsung nama movie
-      payload = generate_carousel_response(sender, text, sentiment_result, sample_tweets)
-      print('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token)
+      payload = generate_carousel_response(sender, movie_name, sentiment_result, sample_tweets)
       print(json.dumps(payload))
       
-      requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, json=json.dumps(payload)) # Lets send it
+      r = requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, json=payload)
+      print('RESPONSE! ' + str(r.status_code))
+      print(r.content)
+
     except Exception as e:
       print(traceback.format_exc())
 
