@@ -36,7 +36,7 @@ def generate_carousel_response(sender,
       "default_action": {
         "type": "web_url",
         "url": sample_tweets[i]['link'],
-        "messenger_extensions": true,
+        "messenger_extensions": True,
         "webview_height_ratio": "tall",
         "fallback_url": "https://twitter.com/"
       },
@@ -72,11 +72,12 @@ def webhook():
   if request.method == 'POST':
     try:
       print(request.data)
-      data = json.loads(str(request.data))
+      data = json.loads(request.data.decode('utf-8'))
       text = data['entry'][0]['messaging'][0]['message']['text']
       sender = data['entry'][0]['messaging'][0]['sender']['id']
 
       sentiment_result, sample_tweets = get_sentiment(text) # Assume text langsung nama movie
+      print(sample_tweets)
       payload = generate_carousel_response(sender, text, sentiment_result, sample_tweets)
       
       requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, json=payload) # Lets send it
