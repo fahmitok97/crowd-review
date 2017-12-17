@@ -24,6 +24,14 @@ class SentiStrength():
         polarity = strength1 * strength2
         return polarity - 1e-9 > 0
 
+    def __get_senti_strength(self, ,mins, maks):
+        if mins + maks - 1e-9 > 0:
+            return maks
+        elif mins + maks - 1e-9 < 0:
+            return mins
+        else:
+            return 0
+
     def calculate_doc(self, tokenize_words):
         words_strength = []
 
@@ -83,6 +91,11 @@ class SentiStrength():
                 prev_word_from_dict = word
 
         if not words_strength:
-            return 0, 0
+            return 0, 0, 0
 
-        return min(words_strength), max(words_strength)
+        mins = min(words_strength)
+        maks = max(words_strength)
+
+        result = self.__get_senti_strength(mins, maks)
+
+        return mins, maks, result
