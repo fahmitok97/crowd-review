@@ -4,11 +4,9 @@ import os
 class SentiStrength():
 
     def __init__(self):
-        # // https://github.com/hitesh915/sentimentstrength/blob/master/wordwithStrength.txt
-        self.word_dict = self.__open_json_file('dicts/words.json')
-        # https"://github.com/athanrous/PySentiment/blob/master/SentiStrength/SentStrength_Data/BoosterWordList.txt
-        self.booster_word_dict = self.__open_json_file('dicts/booster_words.json')
-        self.negating_word_dict = self.__open_json_file('dicts/negating_words.json')
+        self.word_dict = self.__open_json_file('crowd_review/dicts/words.json')
+        self.booster_word_dict = self.__open_json_file('crowd_review/dicts/booster_words.json')
+        self.negating_word_dict = self.__open_json_file('crowd_review/dicts/negating_words.json')
 
     def __open_json_file(self, directory):
         with open(directory) as json_data:

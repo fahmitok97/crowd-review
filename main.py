@@ -1,14 +1,14 @@
-from flask import Flask
-from flask_cors import CORS
+from crowd_review.utils.pre_processor import PreProcessor
+from crowd_review.utils.senti_strength import SentiStrength
 
+import json
 
-app = Flask(__name__)
-CORS(app)
+pre_processor = PreProcessor()
+senti_strength = SentiStrength()
 
+with open('review.json') as f:
+        tweets = json.load(f)
 
-@app.route('/')
-def hello():
-    return "Hello World!"
-
-if __name__ == '__main__':
-    app.run()
+tokenized_tweets = []
+for tweet in tweets:
+    print(senti_strength.calculate_doc(pre_processor.process_doc(tweet)))
