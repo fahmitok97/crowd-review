@@ -24,7 +24,7 @@ class SentiStrength():
         polarity = strength1 * strength2
         return polarity - 1e-9 > 0
 
-    def __get_senti_strength(self, ,mins, maks):
+    def __get_senti_strength(self, mins, maks):
         if mins + maks - 1e-9 > 0:
             return maks
         elif mins + maks - 1e-9 < 0:

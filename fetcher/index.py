@@ -1,7 +1,7 @@
 import json
 
-from settings import HASHTAGS
-from fetcher import Fetcher
+from fetcher.settings import HASHTAGS
+from fetcher.fetcher import Fetcher
 
 fetcher = Fetcher()
 result = []

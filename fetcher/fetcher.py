@@ -1,8 +1,8 @@
 import json
 from tweepy import OAuthHandler, Cursor, API
 
-from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET, NUM_CRAWLED
-from whitelist import ADJECTIVE_SUPERLATIVE_MAP
+from fetcher.settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET, NUM_CRAWLED
+from fetcher.whitelist import ADJECTIVE_SUPERLATIVE_MAP
 
 consumer_key = CONSUMER_KEY
 consumer_secret = CONSUMER_SECRET
@@ -36,7 +36,7 @@ class Fetcher():
 
 		return filtered_tweet
 
-	def search_by_hashtag(self, hashtag):
+	def search_by_hashtag(self, hashtag, with_id=False):
 		crawled = 0
 		tweets = []
 
@@ -53,6 +53,9 @@ class Fetcher():
 
 			crawled += 1
 
-			tweets.append(self.__filter_hashtag(status.full_text, hashtag))
+			if with_id:
+				tweets.append({'id': status.id_str, 'text': self.__filter_hashtag(status.full_text, hashtag)})
+			else:
+				tweets.append(self.__filter_hashtag(status.full_text, hashtag))
 
 		return tweets
