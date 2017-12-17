@@ -23,7 +23,7 @@ def __get_sentiment(movie_title):
   tweets = fetcher.search_by_hashtag(movie_title, with_id=True)
   top_positive_tweet, top_negative_tweet = SentimentAnalyzer.process(tweets)
 
-  return top_negative_tweet, top_negative_tweet
+  return top_positive_tweet, top_negative_tweet
 
 def __generate_about(sender):
     return {
@@ -124,15 +124,15 @@ def webhook():
       if query[0].lower() == 'get_review':
         movie_title = ' '.join(query[1:])
         movie_title_no_space = ''.join(query[1:])
-        tweets = __get_sentiment(movie_title_no_space)
+        positive_tweets, negative_tweets = __get_sentiment(movie_title_no_space)
 
         payload = __generate_review_context(sender, movie_title, isPositive=True)
         __send_chat(payload)
-        payload = __generate_review_carousel(sender, movie_title, tweets, isPositive=True)
+        payload = __generate_review_carousel(sender, movie_title, positive_tweets, isPositive=True)
         __send_chat(payload)
         payload = __generate_review_context(sender, movie_title, isPositive=False)
         __send_chat(payload)
-        payload = __generate_review_carousel(sender, movie_title, tweets, isPositive=False)
+        payload = __generate_review_carousel(sender, movie_title, negative_tweets, isPositive=False)
         __send_chat(payload)
 
       elif query[0].lower() == 'about':
