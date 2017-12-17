@@ -8,6 +8,8 @@ class TfIdf():
     def __init__(self):
         self.tfs = {}
         self.idfs = {}
+        self.document_size = 0
+        self.total_word = 0
 
     def supply_collections(self, tweets):
         tweets_context = []
@@ -19,6 +21,7 @@ class TfIdf():
 
         for tweet in tweets_context:
             words = {}
+            self.total_word += len(tweet)
 
             for word in tweet:
                 if word in self.tfs.keys():
@@ -38,7 +41,7 @@ class TfIdf():
 
     def __get_tf_idf(self, word):
         if word in self.idfs.keys():
-            return self.tfs[word] * math.log2(self.document_size / self.idfs[word])
+            return (self.tfs[word] / self.total_word) * math.log2(self.document_size / self.idfs[word])
         return 0
 
     def get_weight(self, tweet):
