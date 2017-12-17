@@ -1,6 +1,7 @@
 from ekphrasis.classes.preprocessor import TextPreProcessor
 from ekphrasis.classes.tokenizer import SocialTokenizer
 from ekphrasis.dicts.emoticons import emoticons
+from nltk.stem.porter import PorterStemmer
 
 from crowd_review.models.token import Token
 
@@ -12,6 +13,7 @@ OMITTED_TOKEN = ['~', ',', '&', '"', '\'', '{', '}', '#', '@', '$', '%', '^', '*
 class PreProcessor():
 
     def __init__(self):
+        self.stemmer = PorterStemmer()
         self.text_processor = TextPreProcessor(
             normalize=['url', 'email', 'percent', 'money', 'phone', 'user', 'time', 'url', 'date', 'number'],
             omit=['url', 'email', 'percent', 'money', 'phone', 'user', 'time', 'url', 'date', 'number'],
@@ -42,7 +44,7 @@ class PreProcessor():
             else:
                 if prevToken.get_context() not in OMITTED_TOKEN:
                     tokens.append(prevToken)
-                prevToken = Token(context=elem)
+                prevToken = Token(context=elem, base_context=self.stemmer.stem(elem))
 
         tokens.append(prevToken)
         return tokens[1:]
