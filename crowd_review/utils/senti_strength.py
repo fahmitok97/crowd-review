@@ -7,6 +7,9 @@ class SentiStrength():
         self.word_dict = self.__open_json_file('crowd_review/dicts/words.json')
         self.booster_word_dict = self.__open_json_file('crowd_review/dicts/booster_words.json')
         self.negating_word_dict = self.__open_json_file('crowd_review/dicts/negating_words.json')
+        self.positive_emoticon = ['happy', 'kiss', 'laugh', 'surprise', 'wink', 'tong', 'angel', 'heart', 'highfive']
+        self.negative_emoticon = ['sad', 'annoyed', 'seallips', 'devil']
+
 
     def __open_json_file(self, directory):
         with open(directory) as json_data:
@@ -56,6 +59,10 @@ class SentiStrength():
                 for prop in props:
                     if prop == 'allcaps' or prop == 'elongated' or prop == 'emphasis':
                         current_strength = self.__increase_strength(current_strength, 1)
+                    if prop in self.positive_emoticon:
+                        current_strength = self.__increase_strength(current_strength, 1)
+                    if prop in self.negative_emoticon:
+                        current_strength = self.__increase_strength(current_strength, -1)
 
                 if prev_word_from_dict != '':
                     if self.__is_same_polarity(current_strength, words_strength[-1]):
