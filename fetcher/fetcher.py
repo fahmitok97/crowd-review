@@ -25,6 +25,17 @@ class Fetcher():
 				return True
 		return False
 
+	def __filter_hashtag(self, tweet, hashtag):
+		filtered_tweet = ''
+
+		for token in tweet.split(' '):
+			if token.lower() == hashtag:
+				filtered_tweet += '***** '
+			else:
+				filtered_tweet += token + ' '
+
+		return filtered_tweet
+
 	def search_by_hashtag(self, hashtag):
 		crawled = 0
 		tweets = []
@@ -42,6 +53,6 @@ class Fetcher():
 
 			crawled += 1
 
-			tweets.append(status.full_text)
+			tweets.append(self.__filter_hashtag(status.full_text, hashtag))
 
 		return tweets
