@@ -67,9 +67,9 @@ def __generate_review_carousel(sender,
                                tweets,
                                isPositive=False):
   if isPositive :
-        review_type = 'positive'
-    else :
-        review_type = 'negative'
+    review_type = 'positive'
+  else :
+    review_type = 'negative'
 
   tweet_elements = [
      {
