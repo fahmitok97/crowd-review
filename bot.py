@@ -4,13 +4,15 @@ import traceback
 import random
 
 from flask import Flask, request
+from multiprocessing import Pool
+from time import time
 
 from fetcher.fetcher import Fetcher
 from crowd_review.sentiment_analyzer import SentimentAnalyzer
 
 app = Flask(__name__)
 
-TOKEN = "EAAYcuw9LdEMBANZAYCZAZCmNVMRlpSTXvVJTbvhkWA15iNtomikjwbB2EuKtBZCCwcGJSTpZBZAKIzTTZC4byZB7ypR2LvgNswzpkLclznZAdxdRZCoBdBBSbU0jmZA1ZB3ocZC6JVFDKuh3ls5iJnm2bxKRuIQPkaZCnZAwgkiNaCGN2JAmAZDZD"
+TOKEN = "EAAB9oZB88dfQBAMvQYqZAwGaGTVHR9TZBJVOfyeNLvqFIe7c9ut7FyFuZBtwp2MJoqMHJEDMDUey6a0pfhSjhCxlTkVSOkcySS2rHslk2l1GB7BJVp1Tzi5tvVRHahsZBVWHyw2tH49dZBKZBGj4QvQ86C074jgM9tIpSfuUZBtFFAZDZD"
 IMAGE_URL = 'https://upload.wikimedia.org/wikipedia/de/thumb/9/9f/Twitter_bird_logo_2012.svg/1259px-Twitter_bird_logo_2012.svg.png'
 VERIFY_TOKEN = 'ini_projek_ir'
 ENDPOINT_HEADER = 'https://twitter.com/comicstalks/status/'
@@ -111,17 +113,8 @@ def __generate_review_carousel(sender,
 def __send_chat(payload):
     requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + TOKEN, json=payload)
 
-
-@app.route('/webhook', methods=['GET', 'POST'])
-def webhook():
-  if request.method == 'POST':
-    try:
-      data = json.loads(request.data.decode('utf-8'))
-      text = data['entry'][0]['messaging'][0]['message']['text']
-      sender = data['entry'][0]['messaging'][0]['sender']['id']
-      query = text.split(' ')
-
-      if query[0].lower() == 'get_review':
+def handle_webhook(sender, query):
+    if query[0].lower() == 'get_review':
         movie_title = ' '.join(query[1:])
         movie_title_no_space = ''.join(query[1:])
         positive_tweets, negative_tweets = __get_sentiment(movie_title_no_space)
@@ -133,14 +126,30 @@ def webhook():
         payload = __generate_review_context(sender, movie_title, isPositive=False)
         __send_chat(payload)
         payload = __generate_review_carousel(sender, movie_title, negative_tweets, isPositive=False)
-        __send_chat(payload)
-
-      elif query[0].lower() == 'about':
+        __send_chat(payload)    
+    elif query[0].lower() == 'about':
         payload = __generate_about(sender)
         __send_chat(payload)
-      else :
+    else:
         payload = __generate_usage(sender)
         __send_chat(payload)
+    
+    return "ok"
+
+po = Pool()
+
+@app.route('/webhook', methods=['GET', 'POST'])
+def webhook():
+  if request.method == 'POST':
+    try:
+      data = json.loads(request.data.decode('utf-8'))
+      text = data['entry'][0]['messaging'][0]['message']['text']
+      sender = data['entry'][0]['messaging'][0]['sender']['id']
+      query = text.split(' ')
+
+      po.apply_async(handle_webhook, (sender, query))
+      
+      return "ok"
 
     except Exception as e:
       print(traceback.format_exc())
@@ -155,4 +164,4 @@ def webhook():
   return "ok"
 
 if __name__ == '__main__':
-  app.run(debug=True)
+  app.run(debug=True, port=9000)
