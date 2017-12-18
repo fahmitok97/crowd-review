@@ -1,8 +1,24 @@
 class Evaluator():
 	def mean_average_precision(model_tweets, tweet_results):
+		"""Calculate MAP comparing model_tweets with tweet_results
+		Params:
+			model_tweets, tweet_results
+			Type : list of list of tweets
+				ex: [
+					[
+						"shark shark",
+						"sharknado go"
+					],
+					[
+						"coco royok",
+						"cocokroyok"
+					]
+				]
+
+		"""
 		result = 0.0
-		for tweets in tweet_results:
-			result += average_precision(model_tweets, tweets)
+		for i in range(min(len(model_tweets), len(tweets))):
+			result += average_precision(model_tweets[i], tweets[i])
 
 		return result / len(tweet_results)
 
