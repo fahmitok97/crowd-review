@@ -4,6 +4,8 @@ from crowd_review.utils.tf_idf import TfIdf
 
 
 class SentimentAnalyzer():
+	def __sgn(num):
+		return 1 if num >= 0 else -1
 
 	@staticmethod
 	def process(tweets):
@@ -23,9 +25,9 @@ class SentimentAnalyzer():
 		for tweet in tweets:
 			tweet['tf_idf'] = tf_idf.get_weight(tweet['tokenized'])
 
-		tweets.sort(key=lambda tweet: -1.0 * tweet['senti_str'] * tweet['tf_idf'])
+		tweets.sort(key=lambda tweet: -1.0 * (tweet['senti_str'] + __sgn(tweet['senti_str']) * tweet['tf_idf']))
 		top_positive_tweet = tweets[:10]
-		tweets.sort(key=lambda tweet: tweet['senti_str'] * tweet['tf_idf'])
+		tweets.sort(key=lambda tweet: tweet['senti_str'] + __sgn(tweet['senti_str']) * tweet['tf_idf'])
 		top_negative_tweet = tweets[:10]
 
 		return top_positive_tweet, top_negative_tweet
