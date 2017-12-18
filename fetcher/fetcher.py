@@ -1,5 +1,7 @@
 import json
-from tweepy import OAuthHandler, Cursor, API
+import time
+import random
+from tweepy import OAuthHandler, Cursor, API, TweepError
 
 from fetcher.settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET, NUM_CRAWLED
 from fetcher.whitelist import ADJECTIVE_SUPERLATIVE_MAP
@@ -36,26 +38,42 @@ class Fetcher():
 
 		return filtered_tweet
 
+	def __exponential_backoff(self, backoff_time):
+		time.sleep((2 ** backoff_time) + (random.randint(0, 1000) / 1000))
+		return backoff_time + 1
+
 	def search_by_hashtag(self, hashtag, with_id=False):
 		crawled = 0
 		tweets = []
 
-		for status in Cursor(self.api.search, q=hashtag, tweet_mode='extended', lang='en').items(3 * NUM_CRAWLED):
+		cursor = Cursor(self.api.search, q=hashtag, tweet_mode='extended', lang='en').items(3 * NUM_CRAWLED)
 
-			if crawled == NUM_CRAWLED:
+		next_backoff_time = 0
+
+		while True:
+			try:
+				status = cursor.next()
+
+				if crawled == NUM_CRAWLED:
+					break
+
+				if status.full_text[:2] == 'RT':
+					continue
+
+				if not self.__contain_whitelist(status.full_text):
+					continue
+
+				crawled += 1
+
+				if with_id:
+					tweets.append({'id': status.id_str, 'text': self.__filter_hashtag(status.full_text, hashtag)})
+				else:
+					tweets.append(self.__filter_hashtag(status.full_text, hashtag))
+
+			except TweepError:
+				next_backoff_time = self.__exponential_backoff(next_backoff_time)
+				continue
+			except StopIteration:
 				break
-
-			if status.full_text[:2] == 'RT':
-				continue
-
-			if not self.__contain_whitelist(status.full_text):
-				continue
-
-			crawled += 1
-
-			if with_id:
-				tweets.append({'id': status.id_str, 'text': self.__filter_hashtag(status.full_text, hashtag)})
-			else:
-				tweets.append(self.__filter_hashtag(status.full_text, hashtag))
 
 		return tweets
