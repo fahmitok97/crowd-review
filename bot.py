@@ -114,29 +114,33 @@ def __send_chat(payload):
     requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + TOKEN, json=payload)
 
 def handle_webhook(sender, query):
-    if query[0].lower() == 'get_review':
-        movie_title = ' '.join(query[1:])
-        movie_title_no_space = ''.join(query[1:])
-        positive_tweets, negative_tweets = __get_sentiment(movie_title_no_space)
+    try:
+      if query[0].lower() == 'get_review':
+          movie_title = ' '.join(query[1:])
+          movie_title_no_space = ''.join(query[1:])
+          positive_tweets, negative_tweets = __get_sentiment(movie_title_no_space)
 
-        payload = __generate_review_context(sender, movie_title, isPositive=True)
-        __send_chat(payload)
-        payload = __generate_review_carousel(sender, movie_title, positive_tweets, isPositive=True)
-        __send_chat(payload)
-        payload = __generate_review_context(sender, movie_title, isPositive=False)
-        __send_chat(payload)
-        payload = __generate_review_carousel(sender, movie_title, negative_tweets, isPositive=False)
-        __send_chat(payload)    
-    elif query[0].lower() == 'about':
-        payload = __generate_about(sender)
-        __send_chat(payload)
-    else:
-        payload = __generate_usage(sender)
-        __send_chat(payload)
+          payload = __generate_review_context(sender, movie_title, isPositive=True)
+          __send_chat(payload)
+          payload = __generate_review_carousel(sender, movie_title, positive_tweets, isPositive=True)
+          __send_chat(payload)
+          payload = __generate_review_context(sender, movie_title, isPositive=False)
+          __send_chat(payload)
+          payload = __generate_review_carousel(sender, movie_title, negative_tweets, isPositive=False)
+          __send_chat(payload)    
+      elif query[0].lower() == 'about':
+          payload = __generate_about(sender)
+          __send_chat(payload)
+      else:
+          payload = __generate_usage(sender)
+          __send_chat(payload)
     
-    return "ok"
+      return "ok"
+    except Exception as e:
+      print(e)
+      return ""
 
-po = Pool()
+po = Pool(10)
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -153,6 +157,7 @@ def webhook():
 
     except Exception as e:
       print(traceback.format_exc())
+      return "error"
 
   elif request.method == 'GET':
 
